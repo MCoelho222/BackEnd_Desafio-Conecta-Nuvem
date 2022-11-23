@@ -2,13 +2,19 @@ def create_collection_contacts(mongo_client):
     contacts_validator = {
         '$jsonSchema': {
             'bsonType': 'object',
-            'title': 'Validação de usuário',
+            'title': "Contacts validation",
             'required': [
-                'email',
+                'user_id',
+                'contacts',
             ],
             'properties': {
-                'email': {
-                'bsonType': "string"
+                'user_id': {
+                'bsonType': "objectId",
+                'description': "The object id of the authenticated user."
+                },
+                'contacts': {
+                'bsonType': 'object',
+                'description': "The Object with user's contacts separated by domain."
                 },
             },
         }

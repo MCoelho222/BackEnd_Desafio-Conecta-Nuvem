@@ -16,7 +16,6 @@ from src.app.utils import generate_jwt
 CLIENT_SECRETS_FILENAME = os.environ.get("GOOGLE_CLIENT_SECRETS")
 
 
-
 users = Blueprint("users", __name__, url_prefix="/users")
 
 flow = Flow.from_client_config(
@@ -28,15 +27,6 @@ flow = Flow.from_client_config(
   ],
   redirect_uri = "http://localhost:5000/users/callback"
 )
-# flow = Flow.from_client_secrets_file(
-#     client_secrets_file="src/app/utils/credentials.json",
-#     scopes=[
-#         "https://www.googleapis.com/auth/userinfo.email",
-#         "https://www.googleapis.com/auth/userinfo.profile",
-#         "openid",
-#     ],
-#     redirect_uri="http://localhost:5000/users/callback",
-# )
 
 @users.route("/auth/google", methods=["POST"])
 def auth_google():
@@ -78,5 +68,5 @@ def callback():
 
     token = generate_jwt(user_google_dict)
 
-    return redirect(f"{current_app.config['FRONTEND_URL']}#/users/{token}/{name}")
+    return redirect(f"{current_app.config['FRONTEND_URL']}#/users/{token}")
 

@@ -1,15 +1,22 @@
 from __future__ import print_function
 
-import os.path
-
+import os
+# import os.path
+import json
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+CLIENT_SECRETS_FILENAME = '{"installed":{"client_id":"58306360300-s2692rj0jf884lk65l70bhj7e8ad0mcu.apps.googleusercontent.com","project_id":"compact-retina-369401","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost"]}}'
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/contacts.readonly']
+SCOPES = [
+    "openid",
+    'https://www.googleapis.com/auth/contacts.readonly',
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/userinfo.email"
+]
 
 
 def main():
@@ -27,8 +34,8 @@ def main():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_config(
+                client_config=json.loads(CLIENT_SECRETS_FILENAME), scopes=SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
@@ -38,11 +45,21 @@ def main():
         # Call the People API
         # print('List 10 connection names')
         
-        results = service.people().connections().list(
+        contacts_service = service.people().connections().list(
             resourceName='people/me',
             pageSize=2000,
-            personFields='names,emailAddresses').execute()
-        connections = results.get('connections', [])
+            personFields='emailAddresses').execute()
+        connections = contacts_service.get('connections', [])
+        
+        user_service = service.people().get(resourceName='people/me', personFields='names,emailAddresses').execute()
+        username = user_service.get('names')[0].get('displayName')
+        useremail = user_service.get('emailAddresses')[0].get('value')
+
+        user_infos = {
+            'profile': {
+                'name': username,
+                'email': useremail
+                }}
 
         domains = set([])
         emails = set([])
@@ -64,7 +81,9 @@ def main():
                 if email_domain == domain:
                     same_domains.append(email)
             domains_dict[domain] = same_domains
-        return domains_dict
+        # print(domains_dict)
+        user_infos['contacts'] = domains_dict
+        return user_infos
     except HttpError as err:
         print(err)
 
