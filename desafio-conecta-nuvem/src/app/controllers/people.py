@@ -18,15 +18,27 @@ def create_personal_info():
     try:
         user_info = main()
         user = user_info['profile']
+        user_data = {
+            'name': user['name'],
+            'email': user['email']
+        }
+        contacts = user_info['contacts']
         user_exists = mongo_client.users.find_one({'email': user['email']})
         if not user_exists:
-            mongo_client.users.insert_one(user)
+            mongo_client.users.insert_one(user_data)
             user_created = mongo_client.users.find_one({'email': user['email']})
-            contacts = user_info['contacts']
             contacts_info = {
                 'user_id': user_created['_id'],
                 'contacts': contacts
                 }
+            mongo_client.contacts.insert_one(contacts_info)
+        else:
+            user_id = user_exists['_id']
+            contacts_info = {
+                'user_id': user_exists['_id'],
+                'contacts': contacts
+                }
+            user_contacts = mongo_client.contacts.delete_one({'user_id': user_id})
             mongo_client.contacts.insert_one(contacts_info)
         return Response(
             response=json_util.dumps(user_info),
@@ -35,22 +47,22 @@ def create_personal_info():
     except Exception as e:
         print(e)
         return {'error': 'Something went wrong...'}, 500
-        
+
+
 @people.route("/verify/", methods=['GET'])
 def auth_jwt():
     token = request.args.get('token')
     check_token = verify_token(token)
-    
     if check_token:
         response = {'status': 'true'}
     else:
         response = {'status': 'false'}
-        # return redirect(f"{current_app.config['FRONTEND_URL']}#/people/contacts")
     return Response(
         response=json_util.dumps(response),
         status=200,
         mimetype="application/json")
-        
+
+
 @people.route("/logout", methods=['GET'])
 def user_logout():
     try:
