@@ -10,7 +10,7 @@ from google_auth_oauthlib.flow import Flow
 from google import auth
 from google.oauth2 import id_token
 from werkzeug.utils import redirect
-from src.app.utils import generate_jwt
+from src.utils import generate_jwt
 
 
 CLIENT_SECRETS_FILENAME = os.environ.get("GOOGLE_CLIENT_SECRETS")

@@ -1,6 +1,6 @@
 from flask import Flask
-from src.app.controllers.users import users
-from src.app.controllers.people import people
+from src.controllers.users import users
+from src.controllers.people import people
 
 
 def routes(app: Flask):

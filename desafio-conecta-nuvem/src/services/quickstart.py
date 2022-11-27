@@ -2,14 +2,13 @@ from __future__ import print_function
 
 import os
 import json
-from bson import json_util
 from datetime import datetime, timedelta
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from src.app.utils import generate_jwt
+from src.utils import generate_jwt
 
 CLIENT_SECRETS_FILENAME = os.getenv('GOOGLE_CLIENT_SECRETS')
 SECRET_KEY = os.getenv('SECRET_KEY')

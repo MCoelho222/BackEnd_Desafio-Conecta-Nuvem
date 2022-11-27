@@ -1,6 +1,6 @@
-# import os
-from src.app import app
-from src.app.routes import routes
+import os
+from src import app
+from src.routes import routes
 
 # app = create_app(os.getenv('FLASK_ENV'))
 # app_on = app['app']
@@ -8,4 +8,4 @@ from src.app.routes import routes
 routes(app)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))

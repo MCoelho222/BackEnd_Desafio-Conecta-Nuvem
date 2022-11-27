@@ -6,9 +6,9 @@ from bson import json_util
 from flask import current_app, request
 from flask.wrappers import Response
 from werkzeug.utils import redirect
-from src.app.services.quickstart import main
-from src.app.utils import verify_token
-from src.app import mongo_client
+from src.services.quickstart import main
+from src.utils import verify_token
+from src import mongo_client
 
 
 people = Blueprint("people", __name__, url_prefix="/people")
