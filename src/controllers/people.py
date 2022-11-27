@@ -38,7 +38,7 @@ def create_personal_info():
                 'user_id': user_exists['_id'],
                 'contacts': contacts
                 }
-            user_contacts = mongo_client.contacts.delete_one({'user_id': user_id})
+            # user_contacts = mongo_client.contacts.delete_one({'user_id': user_id})
             mongo_client.contacts.insert_one(contacts_info)
         return Response(
             response=json_util.dumps(user_info),
