@@ -2,10 +2,10 @@
 import os
 from flask import Flask
 from flask_cors import CORS
-from src.app.config import app_config
-from src.app.utils import mongo
-from src.app.models.contact import create_collection_contacts
-from src.app.models.user import create_collection_users
+from src.config import app_config
+from src.utils import mongo
+from src.models.contact import create_collection_contacts
+from src.models.user import create_collection_users
 
 
 

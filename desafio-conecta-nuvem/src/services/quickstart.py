@@ -1,15 +1,17 @@
 from __future__ import print_function
 
 import os
-# import os.path
 import json
+from datetime import datetime, timedelta
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from src.utils import generate_jwt
 
-CLIENT_SECRETS_FILENAME = '{"installed":{"client_id":"58306360300-s2692rj0jf884lk65l70bhj7e8ad0mcu.apps.googleusercontent.com","project_id":"compact-retina-369401","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost"]}}'
+CLIENT_SECRETS_FILENAME = os.getenv('GOOGLE_CLIENT_SECRETS')
+SECRET_KEY = os.getenv('SECRET_KEY')
 # If modifying these scopes, delete the file token.json.
 SCOPES = [
     "openid",
@@ -17,7 +19,6 @@ SCOPES = [
     "https://www.googleapis.com/auth/userinfo.profile",
     "https://www.googleapis.com/auth/userinfo.email"
 ]
-
 
 def main():
     """Shows basic usage of the People API.
@@ -54,11 +55,20 @@ def main():
         user_service = service.people().get(resourceName='people/me', personFields='names,emailAddresses').execute()
         username = user_service.get('names')[0].get('displayName')
         useremail = user_service.get('emailAddresses')[0].get('value')
-
+        exp = datetime.utcnow() + timedelta(days=1)
+        
+        payload ={
+                'name': username,
+                'email': useremail,
+                'exp': exp
+                }
+        personal_token = generate_jwt(payload)
+        
         user_infos = {
             'profile': {
                 'name': username,
-                'email': useremail
+                'email': useremail,
+                'token': personal_token,
                 }}
 
         domains = set([])
